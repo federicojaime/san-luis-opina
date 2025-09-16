@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Menu, X, Radio, Play, Pause } from 'lucide-react';
 import { Category } from '@/types';
-import { apiClient } from '@/lib/api';
 
 interface HeaderProps {
   onSearch: (query: string) => void;
@@ -19,6 +18,15 @@ export default function Header({ onSearch, categories }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,148 +38,187 @@ export default function Header({ onSearch, categories }: HeaderProps) {
 
   const toggleRadio = () => {
     setIsPlaying(!isPlaying);
-    // Aquí conectarás el reproductor de radio
   };
 
+  const navigation = [
+    { name: 'Inicio', href: '/' },
+    { name: 'Noticias', href: '/noticias' },
+    { name: 'Newsletter', href: '/newsletter' },
+  ];
+
   return (
-    <motion.header
-      initial={{ y: -100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.8, ease: "easeOut" }}
-      className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200/50 shadow-lg"
-    >
-      {/* Top Bar */}
-      <div className="bg-gradient-to-r from-slo-purple-600 to-slo-orange-500 text-white py-2">
-        <div className="container mx-auto px-4">
+    <>
+      {/* Live Bar */}
+      <div className="bg-red-600 text-white py-2">
+        <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between items-center text-sm">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 }}
-              className="flex items-center gap-4"
-            >
-              <span>🔴 En Vivo</span>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                <span className="font-medium">EN VIVO</span>
+              </div>
+              
               <button
                 onClick={toggleRadio}
-                className="flex items-center gap-2 bg-white/20 hover:bg-white/30 px-3 py-1 rounded-full transition-all duration-300"
+                className="flex items-center gap-2 bg-white/20 hover:bg-white/30 px-3 py-1 rounded-full transition-colors duration-300"
               >
-                {isPlaying ? <Pause size={16} /> : <Play size={16} />}
-                <Radio size={16} />
+                {isPlaying ? <Pause size={14} /> : <Play size={14} />}
+                <Radio size={14} />
                 <span>Radio San Luis Opina</span>
               </button>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 }}
-              className="hidden md:block"
-            >
-              <span>📅 {new Date().toLocaleDateString('es-AR', { 
+            </div>
+            
+            <div className="hidden md:block text-sm">
+              {new Date().toLocaleDateString('es-AR', { 
                 weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-              })}</span>
-            </motion.div>
+                day: 'numeric', 
+                month: 'long' 
+              })}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Main Header */}
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="flex items-center"
-          >
-            <Link href="/" className="flex items-center">
+      <motion.header
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6 }}
+        className={`sticky top-0 z-50 transition-all duration-300 ${
+          isScrolled 
+            ? 'bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm' 
+            : 'bg-white border-b border-gray-100'
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-3">
               <Image
                 src="/assets/logo.png"
                 alt="San Luis Opina"
-                width={80}
-                height={80}
-                className="rounded-full shadow-xl border-2 border-white/50"
+                width={48}
+                height={48}
+                className="rounded-full"
               />
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">San Luis Opina</h1>
+                <p className="text-xs text-gray-500">Noticias de San Luis</p>
+              </div>
             </Link>
-          </motion.div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-8">
-            <Link 
-              href="/" 
-              className="text-gray-700 hover:text-slo-purple-600 font-medium transition-colors duration-300"
-            >
-              Inicio
-            </Link>
-            {categories.slice(0, 5).map((category) => (
-              <Link
-                key={category.slug}
-                href={`/categoria/${category.slug}`}
-                className="text-gray-700 hover:text-slo-purple-600 font-medium transition-colors duration-300 relative group"
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex items-center gap-8">
+              {navigation.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-300"
+                >
+                  {item.name}
+                </Link>
+              ))}
+              
+              {/* Categories Dropdown */}
+              <div className="relative group">
+                <button className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-300">
+                  Categorías
+                </button>
+                
+                <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                  <div className="p-4">
+                    <div className="space-y-2">
+                      {categories.slice(0, 6).map((category) => (
+                        <Link
+                          key={category.slug}
+                          href={`/categoria/${category.slug}`}
+                          className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                        >
+                          <div 
+                            className="w-3 h-3 rounded-full"
+                            style={{ backgroundColor: category.color }}
+                          />
+                          <span className="font-medium text-gray-700 hover:text-blue-600">
+                            {category.name}
+                          </span>
+                          <span className="ml-auto text-xs text-gray-400">
+                            {category.article_count}
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </nav>
+
+            {/* Actions */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsSearchOpen(true)}
+                className="p-2 rounded-lg text-gray-600 hover:text-blue-600 hover:bg-gray-100 transition-all duration-300"
               >
-                {category.name}
-                <span 
-                  className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-slo-purple-500 to-slo-orange-500 group-hover:w-full transition-all duration-300"
-                ></span>
-              </Link>
-            ))}
-          </nav>
+                <Search size={20} />
+              </button>
 
-          {/* Search & Mobile Menu */}
-          <div className="flex items-center gap-4">
-            {/* Search Button */}
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setIsSearchOpen(true)}
-              className="p-2 rounded-full bg-gradient-to-r from-slo-purple-100 to-slo-orange-100 text-slo-purple-600 hover:from-slo-purple-200 hover:to-slo-orange-200 transition-all duration-300"
-            >
-              <Search size={20} />
-            </motion.button>
-
-            {/* Mobile Menu Button */}
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden p-2 rounded-full bg-gradient-to-r from-slo-purple-100 to-slo-orange-100 text-slo-purple-600"
-            >
-              {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
-            </motion.button>
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="lg:hidden p-2 rounded-lg text-gray-600 hover:text-blue-600 hover:bg-gray-100 transition-all duration-300"
+              >
+                {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden bg-white border-t border-gray-200"
-          >
-            <div className="container mx-auto px-4 py-4">
-              <nav className="flex flex-col gap-4">
-                <Link href="/" className="text-gray-700 hover:text-slo-purple-600 font-medium">
-                  Inicio
-                </Link>
-                {categories.map((category) => (
-                  <Link
-                    key={category.slug}
-                    href={`/categoria/${category.slug}`}
-                    className="text-gray-700 hover:text-slo-purple-600 font-medium"
-                  >
-                    {category.name}
-                  </Link>
-                ))}
-              </nav>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="lg:hidden bg-white border-t border-gray-200"
+            >
+              <div className="max-w-7xl mx-auto px-4 py-4">
+                <nav className="space-y-3">
+                  {navigation.map((item) => (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className="block text-gray-700 hover:text-blue-600 font-medium py-2 transition-colors duration-300"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
+                  
+                  <div className="pt-3 border-t border-gray-200">
+                    <p className="text-sm font-medium text-gray-500 mb-3">Categorías</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {categories.slice(0, 6).map((category) => (
+                        <Link
+                          key={category.slug}
+                          href={`/categoria/${category.slug}`}
+                          className="flex items-center gap-2 p-2 rounded-lg text-sm text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-all duration-300"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          <div 
+                            className="w-2 h-2 rounded-full"
+                            style={{ backgroundColor: category.color }}
+                          />
+                          <span>{category.name}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </nav>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.header>
 
       {/* Search Modal */}
       <AnimatePresence>
@@ -180,40 +227,42 @@ export default function Header({ onSearch, categories }: HeaderProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
             onClick={() => setIsSearchOpen(false)}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl"
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-xl font-bold gradient-text mb-4">Buscar Noticias</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Buscar noticias</h3>
+              
               <form onSubmit={handleSearch}>
-                <div className="relative">
-                  <Search className="absolute left-3 top-3 text-gray-400" size={20} />
+                <div className="relative mb-4">
+                  <Search className="absolute left-3 top-3 text-gray-400" size={18} />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="¿Qué estás buscando?"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-slo-purple-500 focus:border-transparent outline-none"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                     autoFocus
                   />
                 </div>
-                <div className="flex gap-3 mt-4">
+                
+                <div className="flex gap-3">
                   <button
                     type="submit"
-                    className="flex-1 bg-gradient-to-r from-slo-purple-600 to-slo-orange-500 text-white py-3 rounded-xl font-medium hover:from-slo-purple-700 hover:to-slo-orange-600 transition-all duration-300"
+                    className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-300"
                   >
                     Buscar
                   </button>
                   <button
                     type="button"
                     onClick={() => setIsSearchOpen(false)}
-                    className="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors duration-300"
+                    className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-300"
                   >
                     Cancelar
                   </button>
@@ -223,6 +272,6 @@ export default function Header({ onSearch, categories }: HeaderProps) {
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.header>
+    </>
   );
 }

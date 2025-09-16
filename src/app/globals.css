@@ -2,26 +2,362 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
 @layer base {
   html {
     scroll-behavior: smooth;
+    font-family: 'Inter', system-ui, sans-serif;
   }
   
   body {
-    @apply bg-gradient-to-br from-slo-purple-50 to-orange-50 text-gray-900;
+    @apply bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 text-gray-900 antialiased;
+    line-height: 1.6;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gradient-to-b from-blue-500 to-purple-500 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply from-blue-600 to-purple-600;
+  }
+
+  /* Selection styling */
+  ::selection {
+    @apply bg-blue-500/20 text-blue-900;
+  }
+
+  /* Focus styles */
+  button:focus,
+  input:focus,
+  textarea:focus,
+  select:focus {
+    @apply outline-none ring-2 ring-blue-500/50 ring-offset-2;
+  }
+
+  /* Smooth transitions for all interactive elements */
+  button,
+  a,
+  input,
+  textarea {
+    @apply transition-all duration-300 ease-in-out;
   }
 }
 
 @layer components {
+  /* Glass effect utility */
   .glass-effect {
-    @apply bg-white/10 backdrop-blur-lg border border-white/20;
+    @apply bg-white/10 backdrop-blur-lg border border-white/20 shadow-glass;
   }
   
+  /* Gradient text utility */
   .gradient-text {
-    @apply bg-gradient-to-r from-slo-purple-600 to-slo-orange-500 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-bold;
   }
   
+  /* Card hover effect */
   .card-hover {
-    @apply transform transition-all duration-300 hover:scale-105 hover:shadow-xl;
+    @apply transform transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:-translate-y-2;
+  }
+
+  /* Button base styles */
+  .btn-primary {
+    @apply bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:from-blue-700 hover:to-purple-700 hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2;
+  }
+
+  .btn-secondary {
+    @apply bg-white/90 backdrop-blur-sm text-gray-700 px-6 py-3 rounded-xl font-semibold border border-gray-200 hover:bg-gray-50 hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2;
+  }
+
+  .btn-ghost {
+    @apply text-gray-600 hover:text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition-all duration-300 flex items-center gap-2;
+  }
+
+  /* Input styles */
+  .input-primary {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white/90 backdrop-blur-sm transition-all duration-300;
+  }
+
+  /* Card styles */
+  .card {
+    @apply bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50 p-6 transition-all duration-300;
+  }
+
+  .card-featured {
+    @apply bg-gradient-to-br from-white via-blue-50/30 to-purple-50/30 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/50 p-8 relative overflow-hidden;
+  }
+
+  /* Article content styles */
+  .prose {
+    @apply max-w-none text-gray-700 leading-relaxed;
+  }
+
+  .prose h1 {
+    @apply text-4xl font-bold text-gray-900 mb-6 leading-tight;
+  }
+
+  .prose h2 {
+    @apply text-3xl font-bold text-gray-900 mb-5 mt-8 leading-tight;
+  }
+
+  .prose h3 {
+    @apply text-2xl font-bold text-gray-900 mb-4 mt-6 leading-tight;
+  }
+
+  .prose h4 {
+    @apply text-xl font-semibold text-gray-900 mb-3 mt-5;
+  }
+
+  .prose p {
+    @apply mb-4 text-lg leading-relaxed;
+  }
+
+  .prose ul {
+    @apply mb-4 pl-6 space-y-2;
+  }
+
+  .prose li {
+    @apply text-lg leading-relaxed list-disc;
+  }
+
+  .prose a {
+    @apply text-blue-600 hover:text-blue-700 underline transition-colors duration-300;
+  }
+
+  .prose blockquote {
+    @apply border-l-4 border-blue-500 pl-6 italic text-gray-600 my-6 bg-blue-50/50 py-4 rounded-r-lg;
+  }
+
+  .prose img {
+    @apply rounded-xl shadow-lg my-6;
+  }
+
+  /* Loading states */
+  .loading-skeleton {
+    @apply bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-pulse rounded;
+    background-size: 200% 100%;
+    animation: loading 1.5s ease-in-out infinite;
+  }
+
+  /* Badge styles */
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold;
+  }
+
+  .badge-primary {
+    @apply bg-blue-100 text-blue-800;
+  }
+
+  .badge-secondary {
+    @apply bg-gray-100 text-gray-800;
+  }
+
+  .badge-success {
+    @apply bg-green-100 text-green-800;
+  }
+
+  .badge-warning {
+    @apply bg-yellow-100 text-yellow-800;
+  }
+
+  .badge-danger {
+    @apply bg-red-100 text-red-800;
+  }
+
+  /* Animation utilities */
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.8s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.5s ease-out;
+  }
+
+  /* Hero section specific styles */
+  .hero-gradient {
+    background: linear-gradient(135deg, 
+      rgba(59, 130, 246, 0.1) 0%, 
+      rgba(147, 51, 234, 0.1) 50%, 
+      rgba(236, 72, 153, 0.1) 100%
+    );
+  }
+
+  /* News grid specific styles */
+  .news-card {
+    @apply bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-2xl border border-white/50 overflow-hidden transition-all duration-500 group;
+  }
+
+  .news-card:hover {
+    @apply transform -translate-y-2 scale-105;
+  }
+
+  /* Category badge colors - will be overridden by inline styles */
+  .category-badge {
+    @apply px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm;
+  }
+
+  /* Modal styles */
+  .modal-backdrop {
+    @apply fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4;
+  }
+
+  .modal-content {
+    @apply bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/50 max-w-lg w-full max-h-[90vh] overflow-auto;
+  }
+
+  /* Responsive utilities */
+  .container-padding {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-padding {
+    @apply py-12 sm:py-16 lg:py-20;
+  }
+}
+
+@layer utilities {
+  /* Custom animations */
+  @keyframes loading {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  @keyframes glow {
+    0%, 100% {
+      box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+    }
+    50% {
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+    }
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes slideInFromLeft {
+    0% {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideInFromRight {
+    0% {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes bounceIn {
+    0% {
+      transform: scale(0.3);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.05);
+    }
+    70% {
+      transform: scale(0.9);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  /* Text utilities */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Layout utilities */
+  .grid-auto-fit {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+
+  .grid-auto-fill {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+
+  /* Background utilities */
+  .bg-mesh {
+    background-image: 
+      radial-gradient(at 40% 20%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
+      radial-gradient(at 80% 0%, rgba(147, 51, 234, 0.1) 0px, transparent 50%),
+      radial-gradient(at 0% 50%, rgba(236, 72, 153, 0.1) 0px, transparent 50%);
+  }
+
+  /* Print styles */
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+    
+    body {
+      background: white !important;
+      color: black !important;
+    }
+  }
+
+  /* Dark mode support (for future implementation) */
+  @media (prefers-color-scheme: dark) {
+    .dark-mode-auto {
+      @apply bg-gray-900 text-white;
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* High contrast support */
+  @media (prefers-contrast: high) {
+    .card {
+      @apply border-2 border-gray-900;
+    }
+    
+    .btn-primary {
+      @apply border-2 border-blue-900;
+    }
   }
 }

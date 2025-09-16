@@ -43,10 +43,9 @@ export default function Footer() {
               {/* Social Media */}
               <div className="flex gap-4">
                 {[
-                  { icon: Facebook, href: '#', label: 'Facebook' },
-                  { icon: Instagram, href: '#', label: 'Instagram' },
-                  { icon: Twitter, href: '#', label: 'Twitter' },
-                  { icon: Youtube, href: '#', label: 'YouTube' },
+                  { icon: Facebook, href: 'https://www.facebook.com/SanLuisOpinaCom', label: 'Facebook' },
+                  { icon: Instagram, href: 'https://www.instagram.com/sanluisopina/', label: 'Instagram' },
+                  { icon: Youtube, href: 'https://www.youtube.com/@tomasnietotv', label: 'YouTube' },
                 ].map(({ icon: Icon, href, label }) => (
                   <motion.a
                     key={label}
